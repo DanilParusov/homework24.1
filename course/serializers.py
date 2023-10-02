@@ -9,14 +9,20 @@ class LessonSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class CourseSerializer(serializers.ModelSerializer):
-    lessons = LessonSerializer(source='lesson', many=True, read_only=True)
+    # Указываем тип поля, функцию получения, и новое поле в fields
+    lessons_count = serializers.SerializerMethodField()
+
+    # Делаем ссылку на сериализатор. В качестве источника указываем set, и many=True для возвращения списка.
+    lessons = LessonSerializer(source='lesson_set', many=True, read_only=True)
+
+    def get_lessons_count(self, instance):
+        return instance.lessons.all().count()
 
     class Meta:
         model = Course
-        fields = '__all__'
+        fields = ['id' ,'title', 'image', 'description', 'lessons_count', 'lessons']
 
-    def get_lessons(self, instance):
-        return instance.lessons.all().count()
+
 
 
 class PaymentSerializer(serializers.ModelSerializer):
