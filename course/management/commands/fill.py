@@ -11,7 +11,7 @@ class Command(BaseCommand):
         courses = Course.objects.all()
         lessons = Lesson.objects.all()
 
-        for _ in range(10):  # Adjust the number of records as needed
+        for _ in range(1):  # Adjust the number of records as needed
             user = choice(users)
             course = choice(courses)
             lesson = choice(lessons)
@@ -27,3 +27,15 @@ class Command(BaseCommand):
                 payment_method=method,
                 payment_data=payment_data
             )
+
+            user = User.objects.create(
+                email='testt@gmail.com',
+                first_name='Admin',
+                last_name='SkyPro',
+                is_staff=True,
+                is_superuser=True,
+                is_active=True
+            )
+
+            user.set_password('8888')
+            user.save()
