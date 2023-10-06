@@ -9,10 +9,7 @@ class LessonSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class CourseSerializer(serializers.ModelSerializer):
-    # Указываем тип поля, функцию получения, и новое поле в fields
     lessons_count = serializers.SerializerMethodField()
-
-    # Делаем ссылку на сериализатор. В качестве источника указываем set, и many=True для возвращения списка.
     lessons = LessonSerializer(source='lesson_set', many=True, read_only=True)
 
     def get_lessons_count(self, instance):
@@ -20,7 +17,7 @@ class CourseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Course
-        fields = ['id' ,'title', 'image', 'description', 'lessons_count', 'lessons']
+        fields = ['id', 'title', 'image', 'description', 'lessons_count', 'lessons']
 
 
 
