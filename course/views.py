@@ -1,7 +1,8 @@
 from rest_framework import viewsets, generics
 
-from course.models import Course, Lesson, Payment
-from course.serializers import CourseSerializer, LessonSerializer, PaymentSerializer
+from course.models import Course, Lesson, Payment, Subscription
+from course.pagination import DataPaginator
+from course.serializers import CourseSerializer, LessonSerializer, PaymentSerializer, SubscriptionSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter
 from course.permissions import IsOwner, IsStaff
@@ -13,9 +14,9 @@ class CourseViewSet(viewsets.ModelViewSet):
     permission_classes = [IsOwner | IsStaff]
     
     def perform_create(self, serializer):
-        new_lesson = serializer.save()
-        new_lesson.owner = self.request.user
-        new_lesson.save()
+        new_course = serializer.save()
+        new_course.owner = self.request.user
+        new_course.save()
     
     
 
@@ -33,11 +34,13 @@ class LessonListApiView(generics.ListAPIView):
     serializer_class = LessonSerializer
     queryset = Lesson.objects.all()
     permission_classes = [IsOwner | IsStaff]
+    pagination_class = DataPaginator
 
 class LessonRetrieveApiView(generics.RetrieveAPIView):
     serializer_class = LessonSerializer
     queryset = Lesson.objects.all()
     permission_classes = [IsOwner | IsStaff]
+    pagination_class = DataPaginator
 
 class LessonUpdateApiView(generics.UpdateAPIView):
     serializer_class = LessonSerializer
@@ -60,3 +63,18 @@ class PaymentListAPIView(generics.ListAPIView):
     filterset_fields = ('paid_course', 'paid_lesson', 'payment_method')
     ordering_fields = ('payment_data',)
     permission_classes = [IsOwner | IsStaff]
+
+class SubscriptionCreateView(generics.CreateAPIView):
+    queryset = Subscription.objects.all()
+    serializer_class = SubscriptionSerializer
+    permission_classes = [IsStaff | IsOwner]
+
+    def perform_create(self, serializer):
+        new_subscription = serializer.save()
+        new_subscription.owner = self.request.user
+        new_subscription.save()
+
+class SubscriptionDeleteView(generics.DestroyAPIView):
+    queryset = Subscription.objects.all()
+    serializer_class = SubscriptionSerializer
+    permission_classes = [IsStaff | IsOwner]

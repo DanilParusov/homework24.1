@@ -143,3 +143,10 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ]
 }
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_HOST_USER = 'n.avramenko87@gmail.com'
+EMAIL_HOST_PASSWORD = "eifzyqqsuezhxpqu"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
