@@ -6,6 +6,9 @@ from course.serializers import CourseSerializer, LessonSerializer, PaymentSerial
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter
 from course.permissions import IsOwner, IsStaff
+import stripe
+
+stripe.api_key = "pk_test_51O2y1aAHG2EDoyGQA1ICrgZp8c26RT4LxOQgfeLLhpVixxlHo2LVM87jgvZ03DW2PAmQ7CuZGSoNaVej0OP3rxdI00qyklzcfM"
 
 
 class CourseViewSet(viewsets.ModelViewSet):
@@ -54,6 +57,33 @@ class LessonDestroyApiView(generics.DestroyAPIView):
 class PaymentCreateAPIView(generics.CreateAPIView):
     serializer_class = PaymentSerializer
     permission_classes = [IsOwner | IsStaff]
+
+    def perform_create(self, serializer):
+        new_payment = serializer.save()
+        new_payment.owner = self.request.user
+        new_payment.save()
+
+        # create user
+        new_customer = self.request.user
+        request_user = stripe.Customer.create(
+            name=new_customer.email,
+            email=new_customer.email,
+        )
+        current_id = request_user.id
+        print(current_id)
+
+        # create transaction
+        request_payment = stripe.PaymentIntent.create(
+            amount=new_payment.course.cost,
+            currency="usd",
+            automatic_payment_methods={"enabled": True},
+            customer=current_id,
+        )
+        print(request_payment.id)
+        # save remote id to base
+        new_payment = serializer.save()
+        new_payment.remote_id = request_payment.id
+        new_payment.save()
 
 
 class PaymentListAPIView(generics.ListAPIView):
