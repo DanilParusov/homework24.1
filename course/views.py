@@ -7,6 +7,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter
 from course.permissions import IsOwner, IsStaff
 import stripe
+from course.tasks import sendmail
 
 stripe.api_key = "pk_test_51O2y1aAHG2EDoyGQA1ICrgZp8c26RT4LxOQgfeLLhpVixxlHo2LVM87jgvZ03DW2PAmQ7CuZGSoNaVej0OP3rxdI00qyklzcfM"
 
@@ -108,3 +109,12 @@ class SubscriptionDeleteView(generics.DestroyAPIView):
     queryset = Subscription.objects.all()
     serializer_class = SubscriptionSerializer
     permission_classes = [IsStaff | IsOwner]
+
+class SubscriptionUpdateView(generics.UpdateAPIView):
+    queryset = Subscription.objects.all()
+    serializer_class = SubscriptionSerializer
+    permission_classes = [IsStaff | IsOwner]
+
+    def put(self, request, *args, **kwargs):
+        sendmail.delay()
+        return self.update(request, *args, **kwargs)
