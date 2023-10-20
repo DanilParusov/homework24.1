@@ -10,3 +10,12 @@ def sendmail():
               settings.EMAIL_HOST_USER,
               ["admin@gmail.com"],
               fail_silently=False)
+            
+@shared_task
+def deactivate_user_month():
+    all_users =User.objects.filter(is_active=True)
+    for user in all_users:
+        if user.last_login <= datetime.now() - timedelta(days=5):
+            user.is_active = False
+            user.save()
+            
