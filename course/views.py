@@ -75,7 +75,7 @@ class PaymentCreateAPIView(generics.CreateAPIView):
 
         # create transaction
         request_payment = stripe.PaymentIntent.create(
-            amount=new_payment.course.cost,
+            amount=new_payment.summ,
             currency="usd",
             automatic_payment_methods={"enabled": True},
             customer=current_id,

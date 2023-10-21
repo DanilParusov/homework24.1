@@ -1,6 +1,10 @@
+from datetime import datetime
+
 from celery import shared_task
 from django.core.mail import send_mail
 from django.conf import settings
+
+from users.models import User
 
 
 @shared_task
@@ -13,9 +17,9 @@ def sendmail():
             
 @shared_task
 def deactivate_user_month():
-    all_users =User.objects.filter(is_active=True)
+    all_users = User.objects.filter(is_active=True)
     for user in all_users:
-        if user.last_login <= datetime.now() - timedelta(days=5):
+        if user.last_login <= datetime.now() - datetime.timedelta(days=5):
             user.is_active = False
             user.save()
             
