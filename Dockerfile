@@ -1,9 +1,7 @@
-FROM python:3.10-slim
+FROM python
 
-WORKDIR /code
+WORKDIR /course/
 
-COPY ./requirements.txt .
+COPY requirements.txt /course/
 
 RUN pip install -r requirements.txt
-
-COPY . .
